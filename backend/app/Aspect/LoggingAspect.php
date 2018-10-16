@@ -2,6 +2,7 @@
 
 namespace App\Aspect;
 
+use App\Annotation\Loggable;
 use Go\Aop\Aspect;
 use Go\Aop\Intercept\MethodInvocation;
 use Go\Lang\Annotation\Before;
@@ -28,10 +29,28 @@ class LoggingAspect implements Aspect
      * Writes a log info before method execution
      *
      * @param MethodInvocation $invocation
-     * @Before("execution(public App\**->*(*))")
+     * @Before("@execution(App\Annotation\Loggable)")
      */
     public function beforeMethod(MethodInvocation $invocation)
     {
-        $this->logger->info($invocation, $invocation->getArguments());
+        $invocationMethod = $invocation->getMethod();
+        $logAnnotation    = $invocationMethod->getAnnotation(Loggable::class);
+        $methodArguments  = $invocation->getArguments();
+        $methodParameters = array_slice(
+            $invocationMethod->getParameters(),
+            0,
+            count($methodArguments)
+        );
+
+        $methodContext = [];
+        foreach ($methodParameters as $index => $methodParameter) {
+            $methodContext[$methodParameter->name] = $methodArguments[$index];
+        }
+
+        $this->logger->log(
+            $logAnnotation->severity,
+            $logAnnotation->template,
+            $methodContext
+        );
     }
 }
