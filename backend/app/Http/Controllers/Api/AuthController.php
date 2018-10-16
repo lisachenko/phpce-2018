@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Annotation\Loggable;
 use Auth;
 use App\User;
 use App\Http\Requests\Api\LoginUser;
@@ -23,6 +24,8 @@ class AuthController extends ApiController
     /**
      * Login user and return the user if successful.
      *
+     * @Loggable(template="User login",severity="debug")
+     *
      * @param LoginUser $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -40,6 +43,8 @@ class AuthController extends ApiController
 
     /**
      * Register a new user and return the user if successful.
+     *
+     * @Loggable(template="User registration")
      *
      * @param RegisterUser $request
      * @return \Illuminate\Http\JsonResponse

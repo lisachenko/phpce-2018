@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Annotation\Loggable;
 use App\Article;
 use App\Comment;
 use App\Http\Requests\Api\CreateComment;
@@ -39,6 +40,8 @@ class CommentController extends ApiController
     /**
      * Add a comment to the article given by its slug and return the comment if successful.
      *
+     * @Loggable(template="Add comment")
+     *
      * @param CreateComment $request
      * @param Article $article
      * @return \Illuminate\Http\JsonResponse
@@ -55,6 +58,8 @@ class CommentController extends ApiController
 
     /**
      * Delete the comment given by its id.
+     *
+     * @Loggable(template="Delete comment")
      *
      * @param DeleteComment $request
      * @param $article

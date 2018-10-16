@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Annotation\Loggable;
 use App\User;
 use App\RealWorld\Transformers\ProfileTransformer;
 
@@ -34,6 +35,8 @@ class ProfileController extends ApiController
     /**
      * Follow the user given by their username and return the user if successful.
      *
+     * @Loggable(template="User following")
+     *
      * @param User $user
      * @return \Illuminate\Http\JsonResponse
      */
@@ -48,6 +51,8 @@ class ProfileController extends ApiController
 
     /**
      * Unfollow the user given by their username and return the user if successful.
+     *
+     * @Loggable(template="User unfollowing")
      *
      * @param User $user
      * @return \Illuminate\Http\JsonResponse

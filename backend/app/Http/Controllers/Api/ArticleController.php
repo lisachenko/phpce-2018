@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Annotation\Loggable;
 use App\Tag;
 use App\Article;
 use App\RealWorld\Paginate\Paginate;
@@ -41,6 +42,8 @@ class ArticleController extends ApiController
 
     /**
      * Create a new article and return the article if successful.
+     *
+     * @Loggable(template="Create article")
      *
      * @param CreateArticle $request
      * @return \Illuminate\Http\JsonResponse
@@ -83,6 +86,8 @@ class ArticleController extends ApiController
     /**
      * Update the article given by its slug and return the article if successful.
      *
+     * @Loggable(template="Update article")
+     *
      * @param UpdateArticle $request
      * @param Article $article
      * @return \Illuminate\Http\JsonResponse
@@ -98,6 +103,8 @@ class ArticleController extends ApiController
 
     /**
      * Delete the article given by its slug.
+     *
+     * @Loggable(severity="warning",template="Delete article")
      *
      * @param DeleteArticle $request
      * @param Article $article
