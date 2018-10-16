@@ -136,7 +136,10 @@ return [
     */
 
     'providers' => [
-
+        /*
+         * Go! AOP Framework Service Providers...
+         */
+        Go\Laravel\GoAopBridge\GoAopServiceProvider::class,
         /*
          * Laravel Framework Service Providers...
          */
