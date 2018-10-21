@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Annotation\Cacheable;
 use App\Annotation\Loggable;
 use App\Article;
 use App\Comment;
@@ -28,21 +29,16 @@ class CommentController extends ApiController
     /**
      * Get all the comments of the article given by its slug.
      *
+     * @Cacheable(time=1)
+     *
      * @param Article $article
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Article $article)
     {
-        $cacheKey = 'comments:' . $article->id;
-        $result   = Cache::get($cacheKey);
-        if ($result === null) {
-            $comments = $article->comments()->get();
-            $result   = $this->respondWithTransformer($comments);
-            Cache::put($cacheKey, $result);
-        }
+        $comments = $article->comments()->get();
 
-
-        return $result;
+        return $this->respondWithTransformer($comments);
     }
 
     /**
