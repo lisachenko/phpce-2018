@@ -8,6 +8,7 @@ use App\Comment;
 use App\Http\Requests\Api\CreateComment;
 use App\Http\Requests\Api\DeleteComment;
 use App\RealWorld\Transformers\CommentTransformer;
+use Illuminate\Support\Facades\Cache;
 
 class CommentController extends ApiController
 {
@@ -32,9 +33,16 @@ class CommentController extends ApiController
      */
     public function index(Article $article)
     {
-        $comments = $article->comments()->get();
+        $cacheKey = 'comments:' . $article->id;
+        $result   = Cache::get($cacheKey);
+        if ($result === null) {
+            $comments = $article->comments()->get();
+            $result   = $this->respondWithTransformer($comments);
+            Cache::put($cacheKey, $result);
+        }
 
-        return $this->respondWithTransformer($comments);
+
+        return $result;
     }
 
     /**
