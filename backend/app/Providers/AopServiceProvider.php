@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
-use App\Aspect\LoggingAspect;
+use Ackintosh\Ganesha\Builder;
+use Ackintosh\Ganesha\Storage\Adapter\Memcached as MemcachedAdapter;
 use App\Aspect\CachingAspect;
+use App\Aspect\CircuitBreakerAspect;
+use App\Aspect\LoggingAspect;
 use Illuminate\Cache\Repository as CacheContract;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +28,28 @@ class AopServiceProvider extends ServiceProvider
             return new CachingAspect($app->make(CacheContract::class));
         });
 
-        $this->app->tag([LoggingAspect::class, CachingAspect::class], ['goaop.aspect']);
+        $this->app->singleton(CircuitBreakerAspect::class, function (Application $app) {
+            $memcached = new \Memcached();
+            $memcached->addServer('localhost', 11211);
+
+            $circuitBreaker = Builder::build([
+                'failureRateThreshold' => 5,
+                'intervalToHalfOpen'   => 5,
+                'minimumRequests'      => 2,
+                'timeWindow'           => 30,
+                'adapter'              => new MemcachedAdapter($memcached),
+            ]);
+
+            return new CircuitBreakerAspect($circuitBreaker);
+        });
+
+        $this->app->tag(
+            [
+                LoggingAspect::class,
+                CachingAspect::class,
+                CircuitBreakerAspect::class
+            ],
+            ['goaop.aspect']
+        );
     }
 }
