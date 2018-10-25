@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Annotation\Fuse;
 use App\Annotation\Loggable;
 use App\Tag;
 use App\Article;
@@ -74,6 +75,8 @@ class ArticleController extends ApiController
 
     /**
      * Get the article given by its slug.
+     *
+     * @Fuse
      *
      * @param Article $article
      * @return \Illuminate\Http\JsonResponse
