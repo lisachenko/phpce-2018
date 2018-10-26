@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Annotation\Deferred;
 use App\Annotation\Loggable;
 use App\User;
 use App\RealWorld\Transformers\ProfileTransformer;
@@ -70,6 +71,8 @@ class ProfileController extends ApiController
 
     /**
      * Sends a push notification about following
+     *
+     * @Deferred
      */
     protected function sendPushNotification()
     {
