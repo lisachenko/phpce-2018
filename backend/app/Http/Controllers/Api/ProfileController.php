@@ -46,6 +46,8 @@ class ProfileController extends ApiController
 
         $authenticatedUser->follow($user);
 
+        $this->sendPushNotification();
+
         return $this->respondWithTransformer($user);
     }
 
@@ -64,5 +66,14 @@ class ProfileController extends ApiController
         $authenticatedUser->unFollow($user);
 
         return $this->respondWithTransformer($user);
+    }
+
+    /**
+     * Sends a push notification about following
+     */
+    protected function sendPushNotification()
+    {
+        // Emulation of long system call
+        sleep(2);
     }
 }
