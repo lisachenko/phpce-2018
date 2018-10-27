@@ -1,0 +1,82 @@
+version: '3'
+services:
+  shell:
+    image: ready2order/dev-shell:latest
+    container_name: phpce-shell
+    command: "sleep infinity"
+    depends_on:
+    - mysql
+    volumes:
+    - ./:/app:cached
+    environment:
+    - REDIS_HOST=phpce-redis
+    - DB_HOST=phpce-mysql
+    - MANAGEMENT_DB_HOST=phpce-mysql
+    - FLUENTD_HOST=phpce-fluentd
+    networks:
+    - phpce
+
+  redis:
+    image: redis:4-alpine
+    container_name: phpce-redis
+    networks:
+      - phpce
+
+  mysql:
+    image: mysql:5.7.22
+    container_name: phpce-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    tmpfs:
+      - /var/lib/mysql
+#    volumes:
+#      - ./mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+    networks:
+      - phpce
+    ports:
+      - "3308:3306"
+
+  fluentd:
+    image: fluent/fluentd
+    container_name: phpce-fluentd
+#    volumes:
+#      - ../../ami/conf/fluentd/:/etc/fluentd/
+    networks:
+      - phpce
+
+  php:
+    image: ready2orderphp:7.2.10
+    container_name: phpce-php
+    command: php-fpm7.2
+    volumes:
+        - ./:/app:cached
+        - php-socket:/run/php
+#        - ./100-settings.ini:/etc/php/7.2/fpm/conf.d/100-r2o-settings.ini
+#        - ./100-settings.ini:/etc/php/7.2/cli/conf.d/100-r2o-settings.ini
+    environment:
+      - REDIS_HOST=phpce-redis
+      - DB_HOST=phpce-mysql
+      - MANAGEMENT_DB_HOST=phpce-mysql
+      - FLUENTD_HOST=phpce-fluentd
+    networks:
+      - phpce
+
+  web:
+    image: nginx:latest
+    container_name: phpce-web
+    ports:
+      - "9081:80"
+    volumes:
+      - ./:/app:cached
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - php-socket:/run/php
+    networks:
+      phpce:
+        aliases:
+          - php-ce
+
+volumes:
+  php-socket:
+
+networks:
+  phpce:
